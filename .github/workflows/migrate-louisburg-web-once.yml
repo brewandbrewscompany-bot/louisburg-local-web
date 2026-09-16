@@ -1,0 +1,74 @@
+name: Migrate Louisburg Local web once
+
+on:
+  push:
+    paths:
+      - '.github/workflows/migrate-louisburg-web-once.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  migrate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check out clean public web repository
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+
+      - name: Fetch only approved Louisburg Local browser files
+        shell: bash
+        run: |
+          set -euo pipefail
+          git clone --depth 1 --filter=blob:none --sparse https://github.com/brewandbrewscompany-bot/brew-brews-radio.git /tmp/source
+          git -C /tmp/source sparse-checkout set louisburg-local/web-v4 louisburg-local/web-v5
+          rm -rf web-v4 web-v5
+          cp -a /tmp/source/louisburg-local/web-v4 ./web-v4
+          cp -a /tmp/source/louisburg-local/web-v5 ./web-v5
+
+          # The branded domain should open V5 directly at the repository root.
+          cp web-v5/index.html index.html
+
+          # History should return to the clean domain root in this dedicated site.
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('web-v4/history.html')
+          s=p.read_text()
+          s=s.replace('../web-v5/?v=history-return5','../?v=history-return5')
+          p.write_text(s)
+          PY
+
+          touch .nojekyll
+
+      - name: Validate public boundary and required UI
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -s index.html
+          test -s web-v5/index.html
+          test -s web-v4/index.html
+          test -s web-v4/history.html
+          grep -q 'Happening in Louisburg' index.html
+          grep -q 'function attachMain' index.html
+          grep -q 'web-v4' index.html
+
+          # Public deployment must not contain backend/worker source or common secret files.
+          test ! -e collector-v1
+          test ! -e social-browser-worker
+          test ! -e wildcats-schedule-worker
+          if find . -type f \( -name '.env' -o -name '.env.*' -o -name '*.pem' -o -name '*.key' -o -name 'credentials*.json' -o -name 'service-account*.json' -o -name 'client_secret*.json' \) | grep -q .; then
+            echo 'Sensitive-looking file found in public web repository.' >&2
+            exit 1
+          fi
+
+      - name: Commit migrated public site and remove one-time migrator
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -f .github/workflows/migrate-louisburg-web-once.yml
+          git config user.name 'brewandbrewscompany-bot'
+          git config user.email '309472494+brewandbrewscompany-bot@users.noreply.github.com'
+          git add -A
+          git commit -m 'Migrate Louisburg Local public web app to dedicated repository'
+          git push
