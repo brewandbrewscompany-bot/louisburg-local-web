@@ -89,6 +89,15 @@
     try{
       const p=window.parent;
       if(p&&p!==window&&p.document){
+        // Keep one Louisburg Local brand title in the drawer and the close button at the right.
+        const leftHead=p.document.querySelector('#leftDrawer .drawerHead');
+        const duplicateTitle=leftHead&&leftHead.querySelector('h2');
+        if(duplicateTitle) duplicateTitle.remove();
+        if(leftHead){
+          leftHead.style.justifyContent='flex-end';
+          leftHead.style.marginBottom='2px';
+        }
+
         const about=[...p.document.querySelectorAll('.navButton')].find(b=>/About Louisburg Local/i.test(b.textContent||''));
         if(about){
           about.removeAttribute('data-screen');
