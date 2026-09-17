@@ -84,6 +84,27 @@
     overlay.querySelector('.close').addEventListener('click',close);
     overlay.addEventListener('click',e=>{if(e.target===overlay)close()});
     document.addEventListener('keydown',e=>{if(e.key==='Escape'&&overlay.classList.contains('open'))close()});
+
+    // V5 flyout About should open this panel directly, not just the More screen.
+    try{
+      const p=window.parent;
+      if(p&&p!==window&&p.document){
+        const about=[...p.document.querySelectorAll('.navButton')].find(b=>/About Louisburg Local/i.test(b.textContent||''));
+        if(about){
+          about.removeAttribute('data-screen');
+          about.onclick=e=>{
+            e.preventDefault();
+            if(typeof p.showScreen==='function') p.showScreen('more');
+            else{
+              const more=document.querySelector('[data-nav="more"]');
+              if(more) more.click();
+              if(typeof p.closeDrawers==='function') p.closeDrawers(false);
+            }
+            setTimeout(()=>card.click(),40);
+          };
+        }
+      }
+    }catch(e){}
   }
 
   const core=document.createElement('script');
