@@ -7,6 +7,15 @@
     const moreGrid=document.querySelector('#moreScreen .moreGrid');
     if(!moreGrid) return;
 
+    // Use a clearer public-facing name while preserving the existing ORIGINALS filter key.
+    const originals=moreGrid.querySelector('[data-more-cat="ORIGINALS"]');
+    if(originals){
+      const title=originals.querySelector('b');
+      const sub=originals.querySelector('small');
+      if(title) title.textContent='★ Only in Louisburg';
+      if(sub) sub.textContent='Unique local places, traditions and experiences';
+    }
+
     if(!document.getElementById('ll-about-style')){
       const style=document.createElement('style');
       style.id='ll-about-style';
