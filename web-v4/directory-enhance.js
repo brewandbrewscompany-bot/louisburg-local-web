@@ -125,9 +125,17 @@
     }catch(e){}
   }
 
+  function loadOnlyInLouisburg(){
+    if(document.getElementById('ll-only-loader')) return;
+    const s=document.createElement('script');
+    s.id='ll-only-loader';
+    s.src='only-in-louisburg.js?v=fingerprint-20260916';
+    document.head.appendChild(s);
+  }
+
   const core=document.createElement('script');
   core.src='directory-enhance-core.js?v=about-20260916';
-  core.onload=installAbout;
-  core.onerror=installAbout;
+  core.onload=()=>{installAbout();loadOnlyInLouisburg()};
+  core.onerror=()=>{installAbout();loadOnlyInLouisburg()};
   document.head.appendChild(core);
 })();
