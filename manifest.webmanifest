@@ -1,0 +1,28 @@
+{
+  "name": "Louisburg Local",
+  "short_name": "Louisburg Local",
+  "description": "Current events, deals, businesses, community updates and local history for Louisburg, Kansas.",
+  "id": "/",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "display_override": [
+    "standalone"
+  ],
+  "background_color": "#4b216d",
+  "theme_color": "#4b216d",
+  "orientation": "any",
+  "categories": [
+    "news",
+    "lifestyle",
+    "local"
+  ],
+  "icons": [
+    {
+      "src": "/icons/louisburg-local.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
