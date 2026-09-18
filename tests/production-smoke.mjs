@@ -2,7 +2,7 @@ import { chromium } from 'playwright';
 
 const ROOT='https://louisburglocalks.com/';
 const EXPECTED_REPO='brewandbrewscompany-bot/louisburg-local-web';
-const EXPECTED_BUILD='20260918-r27';
+const EXPECTED_BUILD='20260918-r28';
 const errors=[];
 const check=(ok,msg)=>{ if(!ok) errors.push(msg); };
 
@@ -145,11 +145,35 @@ async function inspect(viewport,name){
     const search=frame.locator('#v5TopSearch');
     check(await search.count()===1,name+': search button missing');
     if(await search.count()){
+      // Global/top search must route to the Directory when Directory is active.
+      const directoryButton=name==='desktop'
+        ? frame.locator('#v5PrimaryNav [data-v5-nav="directory"]')
+        : frame.locator('.bottom [data-nav="directory"]');
+      await directoryButton.click();
+      await page.waitForTimeout(250);
       await search.click();
       const input=frame.locator('#v5SearchInput');
+      await input.fill('Woolwork');
+      await page.waitForTimeout(350);
+      check((await frame.locator('#directorySearch').inputValue()).toLowerCase()==='woolwork',name+': top search did not route to Directory search');
+      const wool=frame.locator('#directoryList .directoryCard:visible h3');
+      const names=await wool.allTextContents();
+      check(names.some(v=>/WoolWorks/i.test(v)),name+': WoolWorks was not found from Directory search');
+      check(names.length===1,name+': Directory search leaked unrelated listings: '+names.join(' | '));
+      await input.fill('');
+      await page.waitForTimeout(200);
+      await frame.locator('#v5SearchClose').click();
+
+      // Home/global search must still route to current activity when Home is active.
+      const homeButton2=name==='desktop'
+        ? frame.locator('#v5PrimaryNav [data-v5-nav="home"]')
+        : frame.locator('.bottom [data-nav="home"]');
+      await homeButton2.click();
+      await page.waitForTimeout(200);
+      await search.click();
       await input.fill('Louisburg');
       await page.waitForTimeout(250);
-      check((await input.inputValue())==='Louisburg',name+': search input failed');
+      check((await frame.locator('#homeSearch').inputValue())==='Louisburg',name+': top search did not route back to Home search');
       await frame.locator('#v5SearchClose').click();
     }
 
