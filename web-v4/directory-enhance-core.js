@@ -9,7 +9,21 @@
   function norm(v){return String(v||'').toLowerCase().replace(/&/g,' and ').replace(/[^a-z0-9]+/g,' ').replace(/\s+/g,' ').trim()}
   function currentPosts(org){const n=norm(org);return state.items.filter(i=>fresh(i)&&norm(i.organization)===n)}
   function latestPost(org){return currentPosts(org).sort((a,b)=>Number(b.rankScore||0)-Number(a.rankScore||0))[0]||null}
-  function registrySearchText(r){return norm([r.organization,r.category,r.address].join(' '))}
+  function registrySearchText(r){
+    const posts=currentPosts(r&&r.organization);
+    const postText=posts.map(p=>[
+      p.headline,p.summary,p.category,p.activityType,p.location,p.time,p.date,
+      Array.isArray(p.tags)?p.tags.join(' '):p.tags,
+      Array.isArray(p.designationLabels)?p.designationLabels.join(' '):''
+    ].join(' ')).join(' ');
+    return norm([
+      r&&r.organization,r&&r.category,r&&r.address,r&&r.website,r&&r.facebook,
+      r&&r.instagram,r&&r.calendar,
+      Array.isArray(r&&r.designations)?r.designations.join(' '):r&&r.designations,
+      Array.isArray(r&&r.designationLabels)?r.designationLabels.join(' '):r&&r.designationLabels,
+      postText
+    ].join(' '));
+  }
   function registryMatchesQuery(r,q){
     const qn=norm(q);if(!qn)return true;
     const hay=registrySearchText(r);if(hay.includes(qn))return true;
