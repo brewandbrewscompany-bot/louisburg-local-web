@@ -1,0 +1,41 @@
+name: Louisburg Local production smoke
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'index.html'
+      - 'about.html'
+      - 'web-v4/**'
+      - 'robots.txt'
+      - 'sitemap.xml'
+      - 'googled3854f03f7860ff5.html'
+      - 'tests/production-smoke.mjs'
+      - '.github/workflows/production-smoke.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: louisburg-local-production-smoke
+  cancel-in-progress: true
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+          package-manager-cache: false
+      - name: Install Playwright
+        run: npm install --no-save --no-audit --no-fund playwright@1.55.0
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+      - name: Wait for GitHub Pages deployment
+        run: sleep 90
+      - name: Smoke production custom domain
+        run: node tests/production-smoke.mjs
