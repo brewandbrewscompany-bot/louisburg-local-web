@@ -26,20 +26,16 @@
 @media(min-width:1040px){.archiveGrid{grid-template-columns:repeat(4,1fr)}}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.moment{transition:none;transform:none;opacity:1}}
 </style>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-P37SNQNJN1"></script>
 <script>
+window.dataLayer=window.dataLayer||[];
+window.gtag=window.gtag||function(){dataLayer.push(arguments)};
 (function(){
-  const GA_ID='G-P37SNQNJN1';
   try{
     const automated=!!navigator.webdriver||/HeadlessChrome|Playwright|Puppeteer/i.test(String(navigator.userAgent||''))||new URLSearchParams(location.search).get('ll_test')==='1';
     if(automated)return;
-    window.dataLayer=window.dataLayer||[];
-    window.gtag=window.gtag||function(){dataLayer.push(arguments)};
     gtag('js',new Date());
-    gtag('config',GA_ID);
-    const s=document.createElement('script');
-    s.async=true;
-    s.src='https://www.googletagmanager.com/gtag/js?id='+encodeURIComponent(GA_ID);
-    document.head.appendChild(s);
+    gtag('config','G-P37SNQNJN1');
   }catch(e){}
 })();
 </script>
