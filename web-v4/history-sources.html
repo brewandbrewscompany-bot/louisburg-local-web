@@ -10,6 +10,23 @@
 :root{--purple:#4b216d;--deep:#281039;--cream:#f6f0e5;--paper:#fffaf1;--ink:#211923;--muted:#746b72;--line:#ded0dc;--green:#415c45;--gold:#e3c37c}
 *{box-sizing:border-box}body{margin:0;background:var(--cream);color:var(--ink);font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",Arial,sans-serif}a{color:inherit}.top{position:sticky;top:0;z-index:10;background:linear-gradient(135deg,#251034,#4b216d);color:#fff;box-shadow:0 5px 20px #210d2e38}.topin{max-width:940px;margin:auto;padding:12px 14px;display:flex;gap:12px;align-items:center}.back{width:42px;height:42px;border:1px solid #ffffff38;border-radius:14px;display:grid;place-items:center;text-decoration:none;font-size:22px}.brand b{display:block;font:800 20px Georgia,serif}.brand small{font-size:9px;letter-spacing:1px;text-transform:uppercase;opacity:.75}.wrap{max-width:940px;margin:auto;padding:34px 14px 80px}.intro{background:var(--deep);color:#fff;border-radius:22px;padding:24px;margin-bottom:15px}.intro h1{font:800 clamp(30px,6vw,54px)/.95 Georgia,serif;margin:0 0 10px}.intro p{margin:0;line-height:1.6;color:#e8dcea}.note{scroll-margin-top:78px;background:var(--paper);border:1px solid var(--line);border-radius:20px;padding:18px;margin:12px 0;box-shadow:0 8px 24px #3a1d4b0d}.note h2{font:800 23px/1.05 Georgia,serif;color:var(--deep);margin:0 0 8px}.note p{font-size:13px;line-height:1.6;color:#5e555d;margin:7px 0}.status{display:inline-block;border-radius:999px;padding:6px 8px;font-size:8px;font-weight:900;letter-spacing:.65px;text-transform:uppercase;background:#e6efe5;color:#36523b}.status.context{background:#eee5f0;color:#594464}.status.conflict{background:#f1e4cf;color:#6d4e2b}.links{display:flex;flex-wrap:wrap;gap:7px;margin-top:12px}.links a{display:inline-block;text-decoration:none;border:1px solid #d8cadb;background:#fff;border-radius:999px;padding:8px 10px;font-size:10px;font-weight:900;color:var(--purple)}.guard{border-left:4px solid var(--gold);padding-left:12px}.foot{font-size:10px;color:var(--muted);line-height:1.55;margin-top:28px;padding:15px;border-top:1px solid var(--line)}
 </style>
+<script>
+(function(){
+  const GA_ID='G-P37SNQNJN1';
+  try{
+    const automated=!!navigator.webdriver||/HeadlessChrome|Playwright|Puppeteer/i.test(String(navigator.userAgent||''))||new URLSearchParams(location.search).get('ll_test')==='1';
+    if(automated)return;
+    window.dataLayer=window.dataLayer||[];
+    window.gtag=window.gtag||function(){dataLayer.push(arguments)};
+    gtag('js',new Date());
+    gtag('config',GA_ID);
+    const s=document.createElement('script');
+    s.async=true;
+    s.src='https://www.googletagmanager.com/gtag/js?id='+encodeURIComponent(GA_ID);
+    document.head.appendChild(s);
+  }catch(e){}
+})();
+</script>
 </head>
 <body>
 <header class="top"><div class="topin"><a class="back" href="history.html" aria-label="Back to timeline">‹</a><div class="brand"><b>LOUISBURG LOCAL</b><small>History source notes</small></div></div></header>
