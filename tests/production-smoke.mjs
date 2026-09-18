@@ -2,7 +2,7 @@ import { chromium } from 'playwright';
 
 const ROOT='https://louisburglocalks.com/';
 const EXPECTED_REPO='brewandbrewscompany-bot/louisburg-local-web';
-const EXPECTED_BUILD='20260918-r28';
+const EXPECTED_BUILD='20260918-r30';
 const errors=[];
 const check=(ok,msg)=>{ if(!ok) errors.push(msg); };
 
@@ -38,6 +38,8 @@ async function inspect(viewport,name){
 
     check((await page.title()).includes('Louisburg Local'),name+': wrong title');
     check(await page.locator('#v4frame').count()===1,name+': production iframe missing');
+    check((await page.locator('.menuVisit span').innerText()).toLowerCase().includes('unique visitors'),name+': counter label is not unique visitors');
+    check(await page.locator('body').evaluate(()=>navigator.webdriver===true),name+': smoke browser is not flagged automated');
 
     const drawerWidth=await page.locator('#rightDrawer').evaluate(el=>el.getBoundingClientRect().width);
     if(name==='mobile') check(drawerWidth<=320 && drawerWidth<=viewport.width*.76,name+': filter drawer too wide: '+drawerWidth);
