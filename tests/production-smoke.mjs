@@ -2,7 +2,7 @@ import { chromium } from 'playwright';
 
 const ROOT='https://louisburglocalks.com/';
 const EXPECTED_REPO='brewandbrewscompany-bot/louisburg-local-web';
-const EXPECTED_BUILD='20260918-r40';
+const EXPECTED_BUILD='20260918-r41';
 const errors=[];
 const check=(ok,msg)=>{ if(!ok) errors.push(msg); };
 
@@ -39,6 +39,8 @@ async function inspect(viewport,name){
     check((await page.title()).includes('Louisburg Local'),name+': wrong title');
     check(await page.locator('meta[name="theme-color"][content="#4b216d"]').count()===1,name+': PWA theme color missing');
     check(await page.locator('link[rel="manifest"][href="/manifest.webmanifest"]').count()===1,name+': PWA manifest link missing');
+    check(await page.locator('#installAppButton').count()===1,name+': install menu button missing');
+    check((await page.locator('#installAppLabel').innerText()).includes('Install Louisburg Local'),name+': install menu label wrong');
     const manifestResp=await context.request.get(ROOT+'manifest.webmanifest');
     check(manifestResp.ok(),name+': manifest.webmanifest not reachable');
     if(manifestResp.ok()){
