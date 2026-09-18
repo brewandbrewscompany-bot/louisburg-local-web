@@ -2,7 +2,7 @@ import { chromium } from 'playwright';
 
 const ROOT='https://louisburglocalks.com/';
 const EXPECTED_REPO='brewandbrewscompany-bot/louisburg-local-web';
-const EXPECTED_BUILD='20260918-r39';
+const EXPECTED_BUILD='20260918-r40';
 const errors=[];
 const check=(ok,msg)=>{ if(!ok) errors.push(msg); };
 
@@ -46,6 +46,7 @@ async function inspect(viewport,name){
       check(manifest.theme_color==='#4b216d',name+': manifest theme_color mismatch');
       check(manifest.background_color==='#4b216d',name+': manifest background_color mismatch');
       check(manifest.display==='standalone',name+': manifest display is not standalone');
+      check(Array.isArray(manifest.icons)&&manifest.icons.some(i=>i.src==='/icons/louisburg-local-wildcat.svg'&&/maskable/.test(i.purpose||'')),name+': wildcat PWA icon missing from manifest');
     }
     check(await page.locator('#v4frame').count()===1,name+': production iframe missing');
     check((await page.locator('.menuVisit span').innerText()).toLowerCase().includes('unique visitors'),name+': counter label is not unique visitors');
