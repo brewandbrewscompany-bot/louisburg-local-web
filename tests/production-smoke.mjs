@@ -2,7 +2,7 @@ import { chromium } from 'playwright';
 
 const ROOT='https://louisburglocalks.com/';
 const EXPECTED_REPO='brewandbrewscompany-bot/louisburg-local-web';
-const EXPECTED_BUILD='20260918-r26';
+const EXPECTED_BUILD='20260918-r27';
 const errors=[];
 const check=(ok,msg)=>{ if(!ok) errors.push(msg); };
 
@@ -151,6 +151,30 @@ async function inspect(viewport,name){
       await page.waitForTimeout(250);
       check((await input.inputValue())==='Louisburg',name+': search input failed');
       await frame.locator('#v5SearchClose').click();
+    }
+
+    // Detail -> Local Profile must remain in-app and must not trigger a history-back to Home.
+    const detailCard=frame.locator('#feed .feedCard[data-id]').first();
+    if(await detailCard.count()){
+      const detailId=await detailCard.getAttribute('data-id');
+      const detailButton=detailCard.locator('[data-detail]').first();
+      if(await detailButton.count()) await detailButton.click();
+      else await detailCard.click();
+      await frame.locator('#detailOverlay.open').waitFor({state:'visible',timeout:5000});
+      const profileLink=frame.locator('#detailOverlay [data-profile-link]').first();
+      check(await profileLink.count()===1,name+': Local profile link missing from Post Details');
+      if(await profileLink.count()){
+        await profileLink.click();
+        await page.waitForTimeout(250);
+        check(await frame.locator('#profileOverlay').evaluate(el=>el.classList.contains('open')).catch(()=>false),name+': Local profile did not open');
+        check(!await frame.locator('#detailOverlay').evaluate(el=>el.classList.contains('open')).catch(()=>true),name+': Post Details stayed open behind Local profile');
+        const screenAfterProfile=await frame.locator('body').evaluate(()=>window.LLUI?.getSelection?.().screen);
+        check(screenAfterProfile==='home',name+': Local profile changed underlying feed screen unexpectedly: '+screenAfterProfile);
+        const profileTitle=await frame.locator('#profileContent .profileIdentity h2').innerText().catch(()=> '');
+        check(profileTitle.trim().length>0,name+': Local profile content did not render');
+        await frame.locator('#profileOverlay [data-close]').click();
+        await page.waitForTimeout(150);
+      }
     }
 
     const media=frame.locator('#feed .feedCard .media[data-image-zoom]').first();
