@@ -1,0 +1,44 @@
+name: Notify search engines with IndexNow
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'index.html'
+      - 'about.html'
+      - 'web-v4/history.html'
+      - 'sitemap.xml'
+      - 'f4a7d3c81e2b5f609ac744e1983d62bf.txt'
+      - '.github/workflows/indexnow.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: indexnow-louisburg-local
+  cancel-in-progress: true
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - name: Wait briefly for GitHub Pages deployment
+        run: sleep 90
+      - name: Notify IndexNow
+        run: |
+          cat > /tmp/indexnow.json <<'EOF'
+          {
+            "host": "louisburglocalks.com",
+            "key": "f4a7d3c81e2b5f609ac744e1983d62bf",
+            "keyLocation": "https://louisburglocalks.com/f4a7d3c81e2b5f609ac744e1983d62bf.txt",
+            "urlList": [
+              "https://louisburglocalks.com/",
+              "https://louisburglocalks.com/about.html",
+              "https://louisburglocalks.com/web-v4/history.html",
+              "https://louisburglocalks.com/sitemap.xml"
+            ]
+          }
+          EOF
+          curl --fail-with-body --retry 3 --retry-delay 15             -H 'Content-Type: application/json; charset=utf-8'             -d @/tmp/indexnow.json             https://api.indexnow.org/indexnow
