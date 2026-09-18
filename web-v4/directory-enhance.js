@@ -134,7 +134,7 @@
   }
 
   const core=document.createElement('script');
-  core.src='directory-enhance-core.js?v=about-20260916';
+  core.src='directory-enhance-core.js?v=selection-audit-20260918-r8';
   core.onload=()=>{installAbout();loadOnlyInLouisburg()};
   core.onerror=()=>{installAbout();loadOnlyInLouisburg()};
   document.head.appendChild(core);
