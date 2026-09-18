@@ -17,20 +17,16 @@
 <style>
 :root{--purple:#4b216d;--deep:#321447;--cream:#f8f4ec;--paper:#fffdf8;--ink:#26202b;--muted:#6f6572;--line:#e1d6e4}*{box-sizing:border-box}body{margin:0;background:var(--cream);color:var(--ink);font-family:Arial,sans-serif}.top{background:linear-gradient(145deg,var(--deep),var(--purple));color:#fff}.topin{max-width:900px;margin:auto;padding:22px 18px}.top a{color:#fff;text-decoration:none;font-weight:900}.wrap{max-width:900px;margin:auto;padding:36px 18px 70px}.hero{background:linear-gradient(145deg,var(--deep),var(--purple));color:#fff;border-radius:24px;padding:28px;box-shadow:0 14px 34px rgba(50,20,71,.16)}h1{font:800 clamp(38px,8vw,70px)/.95 Georgia,serif;margin:0 0 12px}.hero p{font-size:17px;line-height:1.55;margin:0;max-width:720px;opacity:.92}.grid{display:grid;gap:14px;margin-top:20px}@media(min-width:720px){.grid{grid-template-columns:repeat(2,1fr)}}.card{background:var(--paper);border:1px solid var(--line);border-radius:18px;padding:19px}.card h2{font:800 22px Georgia,serif;color:var(--deep);margin:0 0 8px}.card p{margin:0;color:var(--muted);line-height:1.6}.note{margin-top:20px;padding:16px 18px;background:#f0e8f4;border-left:4px solid var(--purple);border-radius:14px;line-height:1.55}.actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:22px}.actions a{display:inline-block;padding:12px 15px;border-radius:13px;text-decoration:none;font-weight:900}.primary{background:var(--purple);color:#fff}.secondary{background:#eee6f1;color:var(--deep)}
 </style>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-P37SNQNJN1"></script>
 <script>
+window.dataLayer=window.dataLayer||[];
+window.gtag=window.gtag||function(){dataLayer.push(arguments)};
 (function(){
-  const GA_ID='G-P37SNQNJN1';
   try{
     const automated=!!navigator.webdriver||/HeadlessChrome|Playwright|Puppeteer/i.test(String(navigator.userAgent||''))||new URLSearchParams(location.search).get('ll_test')==='1';
     if(automated)return;
-    window.dataLayer=window.dataLayer||[];
-    window.gtag=window.gtag||function(){dataLayer.push(arguments)};
     gtag('js',new Date());
-    gtag('config',GA_ID);
-    const s=document.createElement('script');
-    s.async=true;
-    s.src='https://www.googletagmanager.com/gtag/js?id='+encodeURIComponent(GA_ID);
-    document.head.appendChild(s);
+    gtag('config','G-P37SNQNJN1');
   }catch(e){}
 })();
 </script>
