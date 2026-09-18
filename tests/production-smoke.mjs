@@ -2,7 +2,7 @@ import { chromium } from 'playwright';
 
 const ROOT='https://louisburglocalks.com/';
 const EXPECTED_REPO='brewandbrewscompany-bot/louisburg-local-web';
-const EXPECTED_BUILD='20260918-r37';
+const EXPECTED_BUILD='20260918-r38';
 const errors=[];
 const check=(ok,msg)=>{ if(!ok) errors.push(msg); };
 
@@ -202,6 +202,17 @@ async function inspect(viewport,name){
         check(screenAfterProfile==='home',name+': Local profile changed underlying feed screen unexpectedly: '+screenAfterProfile);
         const profileTitle=await frame.locator('#profileContent .profileIdentity h2').innerText().catch(()=> '');
         check(profileTitle.trim().length>0,name+': Local profile content did not render');
+        const profileFav=frame.locator('#profileContent [data-id] [data-favorite]').first();
+        if(await profileFav.count()){
+          const beforeFav=await profileFav.getAttribute('aria-pressed');
+          await profileFav.click();
+          await page.waitForTimeout(100);
+          const afterFav=await profileFav.getAttribute('aria-pressed');
+          check(afterFav!==beforeFav,name+': Local Profile favorite did not toggle');
+          await profileFav.click();
+          await page.waitForTimeout(100);
+          check(await profileFav.getAttribute('aria-pressed')===beforeFav,name+': Local Profile favorite did not toggle back');
+        }
         await frame.locator('#profileOverlay [data-close]').click();
         await page.waitForTimeout(150);
       }
