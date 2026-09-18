@@ -30,8 +30,6 @@
       icon.textContent='🔍';
       old.replaceWith(icon);
     }
-    const homeDefault=document.querySelector('#quickNav [data-cat="ALL"]');
-    if(homeDefault)homeDefault.classList.remove('active');
     if(!document.getElementById('v4-ui-corrections-style')){
       const style=document.createElement('style');
       style.id='v4-ui-corrections-style';
@@ -180,16 +178,16 @@
     state.dirQuick=b.dataset.dirQuick;state.dirCat='ALL';
     $$('#directoryQuick .eventQuickCard').forEach(x=>x.classList.toggle('active',x===b));
     $$('#directoryChips .chip').forEach(x=>x.classList.toggle('active',x.dataset.dirCat==='ALL'));
-    renderDirectory();
+    renderDirectory();if(typeof syncSelectionUI==='function')syncSelectionUI();
   };
   $('#directoryChips').onclick=e=>{
     const b=e.target.closest('[data-dir-cat]');if(!b)return;
     state.dirCat=b.dataset.dirCat;state.dirQuick='ALL';
     $$('#directoryChips .chip').forEach(x=>x.classList.toggle('active',x===b));
     $$('#directoryQuick .eventQuickCard').forEach(x=>x.classList.toggle('active',x.dataset.dirQuick==='ALL'));
-    renderDirectory();
+    renderDirectory();if(typeof syncSelectionUI==='function')syncSelectionUI();
   };
-  $$('[data-filter-current]').forEach(b=>b.onclick=()=>{state.currentOnly=!state.currentOnly;b.classList.toggle('active',state.currentOnly)});
+  $$('[data-filter-current]').forEach(b=>b.onclick=()=>{state.currentOnly=!state.currentOnly;if(typeof syncSelectionUI==='function')syncSelectionUI()});
 
   async function loadRegistryDirectory(){
     try{
