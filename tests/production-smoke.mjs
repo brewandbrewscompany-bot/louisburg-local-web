@@ -2,7 +2,7 @@ import { chromium } from 'playwright';
 
 const ROOT='https://louisburglocalks.com/';
 const EXPECTED_REPO='brewandbrewscompany-bot/louisburg-local-web';
-const EXPECTED_BUILD='20260918-r38';
+const EXPECTED_BUILD='20260918-r39';
 const errors=[];
 const check=(ok,msg)=>{ if(!ok) errors.push(msg); };
 
@@ -37,6 +37,16 @@ async function inspect(viewport,name){
     if(!await waitForProduction(page,name)) return;
 
     check((await page.title()).includes('Louisburg Local'),name+': wrong title');
+    check(await page.locator('meta[name="theme-color"][content="#4b216d"]').count()===1,name+': PWA theme color missing');
+    check(await page.locator('link[rel="manifest"][href="/manifest.webmanifest"]').count()===1,name+': PWA manifest link missing');
+    const manifestResp=await context.request.get(ROOT+'manifest.webmanifest');
+    check(manifestResp.ok(),name+': manifest.webmanifest not reachable');
+    if(manifestResp.ok()){
+      const manifest=await manifestResp.json();
+      check(manifest.theme_color==='#4b216d',name+': manifest theme_color mismatch');
+      check(manifest.background_color==='#4b216d',name+': manifest background_color mismatch');
+      check(manifest.display==='standalone',name+': manifest display is not standalone');
+    }
     check(await page.locator('#v4frame').count()===1,name+': production iframe missing');
     check((await page.locator('.menuVisit span').innerText()).toLowerCase().includes('unique visitors'),name+': counter label is not unique visitors');
     check(await page.locator('#shareApproxArea').count()===0,name+': removed geography button returned');
