@@ -65,10 +65,10 @@ async function inspect(viewport,name){
     if(name==='mobile') check(drawerWidth<=320 && drawerWidth<=viewport.width*.76,name+': filter drawer too wide: '+drawerWidth);
     else check(drawerWidth<=330,name+': desktop filter drawer too wide: '+drawerWidth);
 
-    const historyResp=await context.request.get(ROOT+'web-v4/history.html');
-    check(historyResp.ok(),name+': history page not reachable');
-    if(historyResp.ok()){
-      const historyHtml=await historyResp.text();
+    const historyAttribResp=await context.request.get(ROOT+'web-v4/history.html');
+    check(historyAttribResp.ok(),name+': history page not reachable');
+    if(historyAttribResp.ok()){
+      const historyHtml=await historyAttribResp.text();
       check(historyHtml.includes('id="references"'),name+': history Sources & acknowledgements section missing');
       check(historyHtml.includes('William G. Cutler'),name+': Cutler bibliography credit missing');
       check(historyHtml.includes('Fred Barnes'),name+': Fred Barnes historian credit missing');
