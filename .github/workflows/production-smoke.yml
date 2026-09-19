@@ -36,8 +36,8 @@ jobs:
         run: npm install --no-save --no-audit --no-fund playwright@1.55.0
       - name: Install Chromium
         run: npx playwright install --with-deps chromium
-      - name: Wait for GitHub Pages deployment
-        run: sleep 90
+      - name: Let Pages deployment start
+        run: sleep 5
       - name: Smoke production custom domain
         id: production_smoke
         continue-on-error: true
