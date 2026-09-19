@@ -2,7 +2,7 @@ import { chromium } from 'playwright';
 
 const ROOT='https://louisburglocalks.com/';
 const EXPECTED_REPO='brewandbrewscompany-bot/louisburg-local-web';
-const EXPECTED_BUILD='20260919-r47';
+const EXPECTED_BUILD='20260919-r48';
 const errors=[];
 const check=(ok,msg)=>{ if(!ok) errors.push(msg); };
 
@@ -105,6 +105,13 @@ async function inspect(viewport,name){
     }
     check(/^live\s*·/i.test(feedStatus),name+': feed did not reach live state: '+feedStatus);
     check(await frame.locator('#homeScreen .feedCard').count()>0,name+': home feed has no cards');
+    const cityBoundary=await frame.locator('body').evaluate(()=>{
+      const woolworks={activityType:'Event / Activity',category:'Event',tags:'',organization:"WoolWorks - The Maker's Nook",headline:'1 ON 1 CLASSES - FOR KIDS AND SPECIAL REQUESTS.',summary:'Location: 106 S Broadway, Louisburg, KS.',designationLabels:[]};
+      const realRoad={activityType:'Public Notice',category:'Public Notice',tags:'',organization:'Local Agency',headline:'Road closure notice',summary:'Road closed for utility work.',designationLabels:[]};
+      return {woolworks:window.catMatch(woolworks,'CITY'),realRoad:window.catMatch(realRoad,'CITY')};
+    });
+    check(cityBoundary?.woolworks===false,name+': Broadway falsely matches City / Alerts');
+    check(cityBoundary?.realRoad===true,name+': real road/public notice no longer matches City / Alerts');
 
     const quick=frame.locator('#v5QuickStrip');
     await quick.waitFor({state:'visible',timeout:20000});
