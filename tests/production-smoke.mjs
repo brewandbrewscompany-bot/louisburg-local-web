@@ -2,7 +2,7 @@ import { chromium } from 'playwright';
 
 const ROOT='https://louisburglocalks.com/';
 const EXPECTED_REPO='brewandbrewscompany-bot/louisburg-local-web';
-const EXPECTED_BUILD='20260919-r42';
+const EXPECTED_BUILD='20260919-r43';
 const errors=[];
 const check=(ok,msg)=>{ if(!ok) errors.push(msg); };
 
@@ -64,6 +64,19 @@ async function inspect(viewport,name){
     const drawerWidth=await page.locator('#rightDrawer').evaluate(el=>el.getBoundingClientRect().width);
     if(name==='mobile') check(drawerWidth<=320 && drawerWidth<=viewport.width*.76,name+': filter drawer too wide: '+drawerWidth);
     else check(drawerWidth<=330,name+': desktop filter drawer too wide: '+drawerWidth);
+
+    const historyResp=await context.request.get(ROOT+'web-v4/history.html');
+    check(historyResp.ok(),name+': history page not reachable');
+    if(historyResp.ok()){
+      const historyHtml=await historyResp.text();
+      check(historyHtml.includes('id="references"'),name+': history Sources & acknowledgements section missing');
+      check(historyHtml.includes('William G. Cutler'),name+': Cutler bibliography credit missing');
+      check(historyHtml.includes('Fred Barnes'),name+': Fred Barnes historian credit missing');
+      check(historyHtml.includes('Louisburg Historical Society'),name+': Louisburg Historical Society credit missing');
+      check(historyHtml.includes('Robert Ebenstein Jr.'),name+': Robert Ebenstein Jr. credit missing');
+      check(historyHtml.includes('Miami County Historical Society &amp; Museum'),name+': Miami County museum credit missing');
+      check(historyHtml.includes('original credit still needed'),name+': unresolved 1957 photo attribution warning missing');
+    }
 
     const robots=await context.request.get(ROOT+'robots.txt');
     check(robots.ok(),name+': robots.txt not reachable');
