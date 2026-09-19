@@ -2,7 +2,7 @@ import { chromium } from 'playwright';
 
 const ROOT='https://louisburglocalks.com/';
 const EXPECTED_REPO='brewandbrewscompany-bot/louisburg-local-web';
-const EXPECTED_BUILD='20260919-r43';
+const EXPECTED_BUILD='20260919-r44';
 const errors=[];
 const check=(ok,msg)=>{ if(!ok) errors.push(msg); };
 
@@ -135,8 +135,15 @@ async function inspect(viewport,name){
     check(badToday.length===0,name+': Today leaked non-today cards: '+badToday.join(','));
 
     const topFilter=frame.locator('#v5TopFilter');
-    check(await topFilter.count()===1,name+': filter button missing');
-    if(await topFilter.count()) await topFilter.click();
+    if(name==='mobile'){
+      check(await topFilter.count()===0,name+': redundant mobile top filter button returned');
+      const filterHandle=page.locator('#rightHandle');
+      check(await filterHandle.count()===1,name+': right-side FILTERS tab missing');
+      if(await filterHandle.count()) await filterHandle.click();
+    }else{
+      check(await topFilter.count()===1,name+': desktop filter button missing');
+      if(await topFilter.count()) await topFilter.click();
+    }
     await page.locator('#rightDrawer').waitFor({state:'visible',timeout:5000});
     await page.locator('#categoryChoices [data-filter-cat="EVENTS"]').click();
     await page.locator('#timeChoices [data-filter-time="TODAY"]').click();
@@ -168,6 +175,7 @@ async function inspect(viewport,name){
         await page.waitForTimeout(300);
         if(screen==='favorites'||screen==='more') check(await frame.locator(selector).evaluate(el=>el.classList.contains('active')).catch(()=>false),name+': '+screen+' did not activate');
         else check(await frame.locator(selector).count()>0 || await frame.locator('#'+screen+'Screen .empty').count()>0,name+': '+screen+' did not render');
+        if(name==='mobile') check(await button.evaluate(el=>el.classList.contains('active')).catch(()=>false),name+': '+screen+' bottom-nav active state missing');
       }
     }
 
@@ -176,6 +184,7 @@ async function inspect(viewport,name){
       : frame.locator('.bottom [data-nav="home"]');
     await homeButton.click();
     await page.waitForTimeout(250);
+    if(name==='mobile') check(await homeButton.evaluate(el=>el.classList.contains('active')).catch(()=>false),name+': home bottom-nav active state missing');
 
     const search=frame.locator('#v5TopSearch');
     check(await search.count()===1,name+': search button missing');
@@ -262,6 +271,30 @@ async function inspect(viewport,name){
       const width=await frame.locator('body').evaluate(el=>el.scrollWidth);
       check(width<=viewport.width+4,name+': horizontal overflow '+width+' > '+viewport.width);
       check(await frame.locator('.bottom').count()===1,name+': mobile bottom navigation missing');
+      check(await frame.locator('#v5TopFilter').count()===0,name+': redundant top filter exists on mobile');
+
+      const leftHandle=page.locator('#leftHandle');
+      check(await leftHandle.count()===1,name+': MENU side tab missing');
+      if(await leftHandle.count()){
+        await leftHandle.click();
+        await page.locator('#leftDrawer').waitFor({state:'visible',timeout:5000});
+        check(await page.locator('#leftDrawer').evaluate(el=>el.classList.contains('open')).catch(()=>false),name+': MENU side tab did not open drawer');
+        await page.locator('#leftDrawer .close').click();
+        await page.waitForTimeout(150);
+      }
+
+      const rightHandle=page.locator('#rightHandle');
+      check(await rightHandle.count()===1,name+': FILTERS side tab missing');
+      if(await rightHandle.count()){
+        await rightHandle.click();
+        await page.locator('#rightDrawer').waitFor({state:'visible',timeout:5000});
+        check(await page.locator('#rightDrawer').evaluate(el=>el.classList.contains('open')).catch(()=>false),name+': FILTERS side tab did not open drawer');
+        await page.locator('#rightDrawer .close').click();
+        await page.waitForTimeout(150);
+      }
+
+      check(!await page.locator('#scrim').evaluate(el=>el.classList.contains('open')).catch(()=>true),name+': transparent scrim remained open after drawers closed');
+      check(await page.locator('#scrim').evaluate(el=>getComputedStyle(el).pointerEvents)==='none',name+': transparent scrim is intercepting taps');
     }
 
     // History must open as a top-level page and remain indexable.
