@@ -2,7 +2,7 @@ import { chromium } from 'playwright';
 
 const ROOT='https://louisburglocalks.com/';
 const EXPECTED_REPO='brewandbrewscompany-bot/louisburg-local-web';
-const EXPECTED_BUILD='20260918-r41';
+const EXPECTED_BUILD='20260919-r42';
 const errors=[];
 const check=(ok,msg)=>{ if(!ok) errors.push(msg); };
 
@@ -51,6 +51,9 @@ async function inspect(viewport,name){
       check(Array.isArray(manifest.icons)&&manifest.icons.some(i=>i.src==='/icons/louisburg-local-wildcat.svg'&&/maskable/.test(i.purpose||'')),name+': wildcat PWA icon missing from manifest');
     }
     check(await page.locator('#v4frame').count()===1,name+': production iframe missing');
+    const frame=page.frameLocator('#v4frame');
+    check(await frame.locator('header.top #menuBtn').count()===0,name+': redundant top menu/filter button returned');
+    check(await frame.locator('header.top #focusSearch').count()===1,name+': top search button missing');
     check((await page.locator('.menuVisit span').innerText()).toLowerCase().includes('unique visitors'),name+': counter label is not unique visitors');
     check(await page.locator('#shareApproxArea').count()===0,name+': removed geography button returned');
     check((await page.content()).includes('G-P37SNQNJN1'),name+': GA4 measurement ID missing from production source');
