@@ -54,7 +54,7 @@ function toggleFavorite(i){if(!i)return false;const all=readFavorites(),id=Strin
 function syncFavoriteButtons(id,saved){
   const key=String(id||'');
   if(!key)return;
-  $('[data-id]').forEach(card=>{
+  $$('[data-id]').forEach(card=>{
     if(String(card.dataset.id||'')!==key)return;
     card.querySelectorAll('[data-favorite]').forEach(btn=>{
       btn.classList.toggle('saved',!!saved);
@@ -99,12 +99,14 @@ function setHomeSelection(cat='ALL',section='ALL',source=''){state.cat=cat||'ALL
 function setContextSearch(value){
     const q=String(value||'');
     if(state.screen==='directory'){
-      const input=$('#directorySearch');if(input){input.value=q;input.dispatchEvent(new Event('input',{bubbles:true}))}
-      else{state.dirQ=q;renderDirectory()}
+      state.dirQ=q;
+      const input=$('#directorySearch');if(input)input.value=q;
+      renderDirectory();
       return 'directory';
     }
-    const input=$('#homeSearch');if(input){input.value=q;input.dispatchEvent(new Event('input',{bubbles:true}))}
-    else{state.q=q.trim().toLowerCase();renderHome()}
+    state.q=q.trim().toLowerCase();
+    const input=$('#homeSearch');if(input)input.value=q;
+    renderHome();
     return 'home';
   }
 window.LLUI={showScreen,setHomeSelection,setContextSearch,restoreScreen:name=>showScreen(name||'home'),closeTransient:closeTransientFromHistory,syncSelections:syncSelectionUI,getSelection:()=>({screen:state.screen,cat:state.cat,section:state.section,eventFilter:state.eventFilter,dealCat:state.dealCat,source:state.source,recent:state.recent,dirCat:state.dirCat||'ALL',dirQuick:state.dirQuick||'ALL',currentOnly:!!state.currentOnly})};

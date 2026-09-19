@@ -2,7 +2,7 @@ import { chromium } from 'playwright';
 
 const ROOT='https://louisburglocalks.com/';
 const EXPECTED_REPO='brewandbrewscompany-bot/louisburg-local-web';
-const EXPECTED_BUILD='20260919-r45';
+const EXPECTED_BUILD='20260919-r46';
 const errors=[];
 const check=(ok,msg)=>{ if(!ok) errors.push(msg); };
 
