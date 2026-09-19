@@ -135,25 +135,34 @@ async function inspect(viewport,name){
     check(badToday.length===0,name+': Today leaked non-today cards: '+badToday.join(','));
 
     const topFilter=frame.locator('#v5TopFilter');
+    const filterHandle=name==='mobile'?page.locator('#rightHandle'):topFilter;
     if(name==='mobile'){
       check(await topFilter.count()===0,name+': redundant mobile top filter button returned');
-      const filterHandle=page.locator('#rightHandle');
       check(await filterHandle.count()===1,name+': right-side FILTERS tab missing');
-      if(await filterHandle.count()) await filterHandle.click();
     }else{
       check(await topFilter.count()===1,name+': desktop filter button missing');
-      if(await topFilter.count()) await topFilter.click();
     }
-    await page.locator('#rightDrawer').waitFor({state:'visible',timeout:5000});
+    const openFilterDrawer=async()=>{
+      if(!await page.locator('#rightDrawer').evaluate(el=>el.classList.contains('open')).catch(()=>false)){
+        if(await filterHandle.count()) await filterHandle.click();
+        await page.waitForTimeout(120);
+      }
+      check(await page.locator('#rightDrawer').evaluate(el=>el.classList.contains('open')).catch(()=>false),name+': filter drawer did not open');
+    };
+    await openFilterDrawer();
     await page.locator('#categoryChoices [data-filter-cat="EVENTS"]').click();
+    await page.waitForTimeout(120);
+    await openFilterDrawer();
     await page.locator('#timeChoices [data-filter-time="TODAY"]').click();
+    await page.waitForTimeout(120);
+    await openFilterDrawer();
     await page.locator('#sourceChoices [data-filter-source="Facebook"]').click();
     await page.waitForTimeout(250);
     const drawerState=await frame.locator('body').evaluate(()=>window.LLUI?.getSelection?.());
     check(drawerState?.cat==='EVENTS' && drawerState?.section==='TODAY' && drawerState?.source==='Facebook',name+': drawer state mismatch '+JSON.stringify(drawerState));
     const badDrawer=await visibleFeedMismatches(frame,(item,win)=>win.catMatch(item,'EVENTS') && win.sectionMatch(item,'TODAY') && String(item.date||'').slice(0,10)===win.lbToday() && win.sourceName(item)==='Facebook');
     check(badDrawer.length===0,name+': combined drawer filters leaked cards: '+badDrawer.join(','));
-    await page.locator('#rightDrawer .close').click();
+    check(!await page.locator('#rightDrawer').evaluate(el=>el.classList.contains('open')).catch(()=>true),name+': auto-applied filter drawer stayed open unexpectedly');
 
     const all=quick.locator('[data-v5-quick="ALL"]');
     await all.click();
