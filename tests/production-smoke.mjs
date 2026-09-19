@@ -212,7 +212,21 @@ async function inspect(viewport,name){
       const wool=frame.locator('#directoryList .directoryCard:visible h3');
       const names=await wool.allTextContents();
       check(names.some(v=>/WoolWorks/i.test(v)),name+': WoolWorks was not found from Directory search');
-      check(names.length===1,name+': Directory search leaked unrelated listings: '+names.join(' | '));
+      let dirDebug=null;
+      if(names.length!==1){
+        dirDebug=await frame.locator('body').evaluate(()=>{
+          let dirQ='unavailable',screen='unavailable',renderHead='unavailable',handlerHead='unavailable';
+          try{dirQ=eval('state.dirQ')}catch(e){dirQ='eval-error:'+e.message}
+          try{screen=eval('state.screen')}catch(e){screen='eval-error:'+e.message}
+          try{renderHead=eval('renderDirectory.toString().slice(0,180)')}catch(e){renderHead='eval-error:'+e.message}
+          try{handlerHead=String(document.querySelector('#directorySearch')?.oninput||'').slice(0,180)}catch(e){handlerHead='error:'+e.message}
+          return {dirQ,screen,count:document.querySelector('#directoryCount')?.textContent||'',renderHead,handlerHead};
+        });
+        await frame.locator('#directorySearch').dispatchEvent('input');
+        await page.waitForTimeout(180);
+        dirDebug.afterDirectInput=(await wool.allTextContents()).map(v=>v.trim());
+      }
+      check(names.length===1,name+': Directory search leaked unrelated listings: '+names.join(' | ')+' | DEBUG '+JSON.stringify(dirDebug));
       await input.fill('');
       await page.waitForTimeout(200);
       await frame.locator('#v5SearchClose').click();
